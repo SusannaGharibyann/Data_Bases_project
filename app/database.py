@@ -1,14 +1,23 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
-DATABASE_URL = "postgresql://user:password@localhost/sports_db"
+# Load environment variables
+load_dotenv()
+
+# Connection details
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://pguser:pwd123@localhost:5432/my_database")
+
+# SQLAlchemy setup
 engine = create_engine(DATABASE_URL)
-session_local = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Dependency to get a database session
 def get_db():
-    db = session_local()
+    db = SessionLocal()
     try:
         yield db
     finally:
